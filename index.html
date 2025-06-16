@@ -22,8 +22,10 @@
     }
 
     const ahora = new Date();
-    const hora = ahora.toISOString().split("T")[1];
-    const dia = ahora.toISOString().split("T")[0];
+    const isoStr = ahora.toISOString();
+    const hora = isoStr.split("T")[1].split(".")[0]; // hora sin milisegundos ni Z
+    const dia = isoStr.split("T")[0];
+
 
     const data = {
       latitud: latitud,
