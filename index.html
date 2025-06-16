@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Registro QR</title>
+</head>
+<body>
+  <h2>Escaneo exitoso</h2>
+  <p id="mensaje">Enviando datos...</p>
+
+  <script>
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    const latitud = parseFloat(getQueryParam("latitud"));
+    const longitud = parseFloat(getQueryParam("longitud"));
+
+    if (isNaN(latitud) || isNaN(longitud)) {
+      document.getElementById("mensaje").innerText = "❌ Coordenadas no válidas.";
+      throw new Error("Latitud o longitud inválidas.");
+    }
+
+    const ahora = new Date();
+    const hora = ahora.toISOString().split("T")[1];
+    const dia = ahora.toISOString().split("T")[0];
+
+    const data = {
+      latitud: latitud,
+      longitud: longitud,
+      hora: hora,
+      dia: dia,
+      id_usuario: navigator.userAgent
+    };
+
+    fetch("https://3ca8-143-255-104-133.ngrok-free.app/api/v1/punto/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    })
+    .then(res => {
+      if (res.ok) {
+        document.getElementById("mensaje").innerText = "✅ Registro enviado con éxito.";
+      } else {
+        document.getElementById("mensaje").innerText = "❌ Error al enviar.";
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      document.getElementById("mensaje").innerText = "❌ Error de conexión.";
+    });
+  </script>
+</body>
+</html>
