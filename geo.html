@@ -1,53 +1,56 @@
 <!DOCTYPE html>
-
 <html>
 <head>
-  <title>Ubicación desde QR</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    #map { height: 90vh; width: 100%; }
-  </style>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <title>Registro QR</title>
 </head>
 <body>
-  <h2>Ubicación recibida</h2>
-  <div id="map"></div>
+  <h2>Escaneo exitoso</h2>
+  <p id="mensaje">Enviando datos...</p>
 
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const lat = parseFloat(urlParams.get("lat"));
-    const lng = parseFloat(urlParams.get("lng"));
-
-    if (!isNaN(lat) && !isNaN(lng)) {
-      const map = L.map("map").setView([lat, lng], 15);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "Map data © OpenStreetMap contributors",
-      }).addTo(map);
-      L.marker([lat, lng]).addTo(map).bindPopup("Punto escaneado").openPopup();
-
-      const payload = {
-        lat,
-        lng,
-        timestamp: new Date().toISOString(),
-        userAgent: navigator.userAgent
-      };
-
-      fetch("https://webhook.site/#!/view/c01bf09a-1fe1-4ffa-9070-f27d7357d9af", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      }).then(() => {
-        console.log("Datos enviados al servidor.");
-      }).catch(err => {
-        console.error("Error al enviar datos:", err);
-      });
-
-    } else {
-      document.body.innerHTML = "<p>Error: Coordenadas inválidas.</p>";
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
     }
+
+    const latitud = parseFloat(getQueryParam("latitud"));
+    const longitud = parseFloat(getQueryParam("longitud"));
+
+    if (isNaN(latitud) || isNaN(longitud)) {
+      document.getElementById("mensaje").innerText = "❌ Coordenadas no válidas.";
+      throw new Error("Latitud o longitud inválidas.");
+    }
+
+    const ahora = new Date();
+    const hora = ahora.toISOString().split("T")[1];
+    const dia = ahora.toISOString().split("T")[0];
+
+    const data = {
+      latitud: latitud,
+      longitud: longitud,
+      hora: hora,
+      dia: dia,
+      id_usuario: navigator.userAgent
+    };
+
+    fetch("https://3ca8-143-255-104-133.ngrok-free.app/api/v1/punto/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    })
+    .then(res => {
+      if (res.ok) {
+        document.getElementById("mensaje").innerText = "✅ Registro enviado con éxito.";
+      } else {
+        document.getElementById("mensaje").innerText = "❌ Error al enviar.";
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      document.getElementById("mensaje").innerText = "❌ Error de conexión.";
+    });
   </script>
 </body>
 </html>
