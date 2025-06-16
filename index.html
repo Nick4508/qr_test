@@ -22,9 +22,12 @@
     }
 
     const ahora = new Date();
-    const isoStr = ahora.toISOString();
-    const hora = isoStr.split("T")[1].split(".")[0]; // hora sin milisegundos ni Z
-    const dia = isoStr.split("T")[0];
+
+    const hora = ahora.toLocaleTimeString('es-CL', { hour12: false }); 
+    const anio = ahora.getFullYear();
+    const mes = String(ahora.getMonth() + 1).padStart(2, '0');
+    const diaNum = String(ahora.getDate()).padStart(2, '0');
+    const diaLocal = `${anio}-${mes}-${diaNum}`; 
 
 
     const data = {
