@@ -15,6 +15,7 @@
 
     const latitud = parseFloat(getQueryParam("latitud"));
     const longitud = parseFloat(getQueryParam("longitud"));
+    const nombre_punto = getQueryParam("nombre_punto");
 
     if (isNaN(latitud) || isNaN(longitud)) {
       document.getElementById("mensaje").innerText = "❌ Coordenadas no válidas.";
@@ -22,20 +23,19 @@
     }
 
     const ahora = new Date();
-
-    const hora = ahora.toLocaleTimeString('es-CL', { hour12: false }); 
+    const hora = ahora.toLocaleTimeString('es-CL', { hour12: false });
     const anio = ahora.getFullYear();
     const mes = String(ahora.getMonth() + 1).padStart(2, '0');
     const diaNum = String(ahora.getDate()).padStart(2, '0');
-    const diaLocal = `${anio}-${mes}-${diaNum}`; 
-
+    const diaLocal = `${anio}-${mes}-${diaNum}`;
 
     const data = {
       latitud: latitud,
       longitud: longitud,
       hora: hora,
       dia: diaLocal,
-      id_usuario: navigator.userAgent
+      id_usuario: navigator.userAgent,
+      nombre_punto: nombre_punto || "Desconocido"
     };
 
     fetch("https://3ca8-143-255-104-133.ngrok-free.app/api/v1/punto/", {
